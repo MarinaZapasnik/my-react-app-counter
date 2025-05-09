@@ -1,0 +1,105 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.App {
+    max-width: 100vw;
+    margin: 0 auto;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    background-color: #333;
+    height: 100vh;
+}
+
+.localStorage {
+    display: flex;
+    
+}
+
+.Counter {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    max-height: 100%;
+
+}
+
+.frame {
+    border: 3px solid rgb(107, 107, 216);
+    border-radius: 8px;
+    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    
+}
+
+.count {
+    color:rgb(107, 107, 216);
+    font-size: 90px;
+}
+.bigredcount {
+    color:rgb(240, 38, 38);
+    font-size: 100px;
+}
+.text {
+    color:rgb(107, 107, 216);
+    font-size: 20px; 
+}
+
+.redtext {
+    color:rgb(240, 38, 38);
+    font-size: 20px; 
+}
+
+.btn {
+    height: 30px;
+    width: 100px;
+    border: 3px solid rgb(107, 107, 216);
+    border-radius: 8px;
+    background-color:rgb(107, 107, 216);
+    color: #333;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.btn:disabled {
+    background-color:rgb(145, 145, 157);
+    border: 3px solid rgb(145, 145, 157);
+    opacity: 0.5;
+    cursor: help;
+    
+}
+
+.label {
+    color: rgb(107, 107, 216);
+    font-size: 20px;
+}
+
+.input {
+    border: 3px solid rgb(107, 107, 216);
+    border-radius: 8px;
+}
+
+.inputerror {
+    border: 3px solid rgb(240, 38, 38);
+    border-radius: 8px;
+    background-color: rgb(232, 172, 172);
+
+}
+
+.input:focus,
+.inputerror
+{
+    outline: none; /* 🔥 Убираем стандартную рамку */
+  }
