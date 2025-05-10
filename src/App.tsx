@@ -9,39 +9,35 @@ import { Input } from './Input'
 function App() {
 
   type ValueProps = {
-    minValue: any
-    maxValue: number
+    values: {minValue: number, maxValue: number}
+    inputValues: {minValue: number, maxValue: number}
   }
 
-  const [values, setValues] = useState<ValueProps>(
-    {
-      minValue: 0,
-      maxValue: 10,
-    }
-  )
-
-  const [inputValues, setInputValues] = useState<ValueProps>(
-    {
-      minValue: 0,
-      maxValue: 10,
-    }
-  )
-
-  const [view, setView] = useState(values.minValue)
-
-  const [className, setClassName] = useState('count')
-
+  type ViewProps = number | "incorrect value!" | "enter values and press 'set'";
   
+  const initialState: ValueProps = {
+    values: { minValue: 0, maxValue: 10 },
+    inputValues: { minValue: 0, maxValue: 10 },
+  }
+
+  const minLimitValue:number = 0
+  const maxLimitValue:number = 100
+
+  const [state, setState] = useState<ValueProps>(initialState);
+
+  const [view, setView] = useState<ViewProps>(0)
+
+  const [className, setClassName] = useState<string>('count')
 
   const [isDisabled, setIsDisabled] = useState<boolean>(false)
 
   const incrementHandler = () => {
-    if (values.minValue <= values.maxValue) {
-      setValues({ ...values, minValue: values.minValue + 1 });
-      setView(values.minValue+1)
+    if (state.values.minValue <= state.values.maxValue) {
+      setState({ ...state,values:{...state.values,minValue: state.values.minValue + 1}});
+      setView(state.values.minValue+1)
       setIsDisabled(true)
       setClassName('count')
-      if (values.minValue + 1 === values.maxValue) {
+      if (state.values.minValue + 1 === state.values.maxValue) {
         setClassName('bigredcount');
       } 
     }
@@ -49,8 +45,8 @@ function App() {
   }
 
   const resetHandler = () => {
-    setView(inputValues.minValue)
-    setValues(inputValues)
+    setView(state.inputValues.minValue)
+    setState({...state, values: state.inputValues})
     setIsDisabled(false)
     setClassName('count')
   }
@@ -58,9 +54,9 @@ function App() {
   const getValueHandler = (event: ChangeEvent<HTMLInputElement>, value: string) => {
     
     let newValue = Number(event.target.value) 
-    let udatedInputValues = {...inputValues, [value]:newValue}
+    let udatedInputValues = {...state.inputValues, [value]:newValue}
     
-    if (udatedInputValues.minValue >= udatedInputValues.maxValue || udatedInputValues.minValue < 0 || udatedInputValues.maxValue<=0 || newValue > 100) {
+    if (udatedInputValues.minValue >= udatedInputValues.maxValue || udatedInputValues.minValue < minLimitValue || udatedInputValues.maxValue <= minLimitValue || newValue > maxLimitValue) {
       setView('incorrect value!')
       setIsDisabled(true)
       setClassName('redtext')
@@ -69,29 +65,26 @@ function App() {
       setIsDisabled(false)
       setClassName('text')
     }
-    setInputValues (udatedInputValues)
+    setState({...state, inputValues: udatedInputValues})
   }
 
   const setValuesHandler = () => {
 
-    if (inputValues.minValue >= 0 && inputValues.minValue < inputValues.maxValue) {
-        setValues(inputValues)
-        setView(inputValues.minValue)
+    if (state.inputValues.minValue >= minLimitValue && state.inputValues.minValue < state.inputValues.maxValue) {
+        setState({...state, values:state.inputValues})
+        setView(state.inputValues.minValue)
         setIsDisabled(true)
         setClassName('count')
     } else {
-      setView("incorrect value!"); // ✅ Показываем ошибку
-      setIsDisabled(true); // ✅ Дизейблим кнопку set
-      setClassName("redtext"); // ✅ Красный стиль
+      setView("incorrect value!"); 
+      setIsDisabled(true); 
+      setClassName("redtext");
+      }
   }
 
+  const getViewHandler = () => { 
     
-  }
-
-  const getViewHandler = () => {  
-    
-    
-    if (inputValues.minValue >= inputValues.maxValue || inputValues.minValue < 0 || inputValues.maxValue <= 0 || inputValues.maxValue > 100) {
+    if (state.inputValues.minValue >= state.inputValues.maxValue || state.inputValues.minValue < minLimitValue || state.inputValues.maxValue <= minLimitValue || state.inputValues.maxValue > maxLimitValue) {
       setView('incorrect value!')
       setClassName("redtext");
     } else {
@@ -144,16 +137,16 @@ function App() {
         <Frame width='400px' height='210px'>
             <Frame width='380px' height='120px'>
               <Input 
-                  className={(inputValues.minValue >= inputValues.maxValue || inputValues.minValue < 0) ? 'inputerror' : 'input'}
+                  className={(state.inputValues.minValue >= state.inputValues.maxValue || state.inputValues.minValue < minLimitValue) ? 'inputerror' : 'input'}
                   label='max value:' 
-                  placeholder={inputValues.maxValue.toString()} 
+                  placeholder={`<= ${maxLimitValue}`} 
                   onChange={(event: ChangeEvent<HTMLInputElement>) => getValueHandler(event,'maxValue')}
                   onClick={getViewHandler}/>
               
               <Input 
-                  className={(inputValues.minValue >= inputValues.maxValue || inputValues.minValue < 0) ? 'inputerror' : 'input'}
+                  className={(state.inputValues.minValue >= state.inputValues.maxValue || state.inputValues.minValue < minLimitValue) ? 'inputerror' : 'input'}
                   label='start value:' 
-                  placeholder={inputValues.minValue.toString()} 
+                  placeholder={`>= ${minLimitValue}`} 
                   onChange={(event: ChangeEvent<HTMLInputElement>) => getValueHandler(event,'minValue')}
                   onClick={getViewHandler}/>
 
@@ -161,7 +154,7 @@ function App() {
             </Frame>
             <Frame width='380px' height='50px'>
               <div style={{display:'flex', gap:'20px'}}>
-                <Button title='set' onClick={setValuesHandler} disabled={isDisabled || inputValues.minValue < 0 || inputValues.minValue >= inputValues.maxValue}></Button>
+                <Button title='set' onClick={setValuesHandler} disabled={isDisabled || state.inputValues.minValue < minLimitValue || state.inputValues.minValue >= state.inputValues.maxValue}></Button>
                 
               </div>
               
@@ -175,7 +168,7 @@ function App() {
             </Frame>
             <Frame width='380px' height='50px'>
               <div style={{display:'flex', gap:'20px'}}>
-                <Button title='inc' onClick={incrementHandler} disabled={values.minValue >= values.maxValue || view==="enter values and press 'set'" || view==="incorrect value!"}></Button>
+                <Button title='inc' onClick={incrementHandler} disabled={state.values.minValue >= state.values.maxValue || view==="enter values and press 'set'" || view==="incorrect value!"}></Button>
                 <Button title='reset' onClick={resetHandler} disabled={!isDisabled || view==="enter values and press 'set'" || view==="incorrect value!"}></Button>
               </div>
               
