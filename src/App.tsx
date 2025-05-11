@@ -14,10 +14,12 @@ function App() {
   }
 
   type ViewProps = number | "incorrect value!" | "enter values and press 'set'";
+
+  
   
   const initialState: ValueProps = {
     values: { minValue: 0, maxValue: 10 },
-    inputValues: { minValue: 0, maxValue: 10 },
+    inputValues: { minValue: 0, maxValue: 10 }
   }
 
   const minLimitValue:number = 0
@@ -25,28 +27,51 @@ function App() {
 
   const [state, setState] = useState<ValueProps>(initialState);
 
-  const [view, setView] = useState<ViewProps>(0)
+  
+
+  const [view, setView] = useState<ViewProps>(JSON.parse(localStorage.getItem("viewValue") ?? "0"))
+
 
   const [className, setClassName] = useState<string>('count')
 
   const [isDisabled, setIsDisabled] = useState<boolean>(false)
 
+  ///работа с localStorage
+
+  // функция, которая сетает изменения во вью и сразу же передает значение в localStorage
+  const updateView = (newView: ViewProps) => {
+    setView(newView); 
+    localStorage.setItem("viewValue", JSON.stringify(newView)); // Сохраняем `view` в LocalStorage
+};
+
+// функция, которая сетает изменения в inputValues и сразу же передает значение в localStorage
+const updateState = (newState: ValueProps) => {
+  setState(newState); 
+  localStorage.setItem("minInputValue", JSON.stringify(newState.inputValues.minValue))
+  localStorage.setItem("maxInputValue", JSON.stringify(newState.inputValues.maxValue))
+  localStorage.setItem("minViewValue", JSON.stringify(newState.values.minValue))
+  localStorage.setItem("maxViewValue", JSON.stringify(newState.values.maxValue))
+ 
+};
+
+  ////////////////////
+
   const incrementHandler = () => {
     if (state.values.minValue <= state.values.maxValue) {
-      setState({ ...state,values:{...state.values,minValue: state.values.minValue + 1}});
-      setView(state.values.minValue+1)
+      updateState({ ...state,values:{...state.values,minValue: state.values.minValue + 1}});
+      updateView(state.values.minValue+1)
       setIsDisabled(true)
       setClassName('count')
       if (state.values.minValue + 1 === state.values.maxValue) {
         setClassName('bigredcount');
       } 
     }
-    
+          
   }
 
   const resetHandler = () => {
-    setView(state.inputValues.minValue)
-    setState({...state, values: state.inputValues})
+    updateView(state.inputValues.minValue)
+    updateState({...state, values: state.inputValues})
     setIsDisabled(false)
     setClassName('count')
   }
@@ -57,40 +82,44 @@ function App() {
     let udatedInputValues = {...state.inputValues, [value]:newValue}
     
     if (udatedInputValues.minValue >= udatedInputValues.maxValue || udatedInputValues.minValue < minLimitValue || udatedInputValues.maxValue <= minLimitValue || newValue > maxLimitValue) {
-      setView('incorrect value!')
+      updateView('incorrect value!')
       setIsDisabled(true)
       setClassName('redtext')
     } else {
-      setView("enter values and press 'set'")
+      updateView("enter values and press 'set'")
       setIsDisabled(false)
       setClassName('text')
     }
-    setState({...state, inputValues: udatedInputValues})
+    updateState({...state, inputValues: udatedInputValues})
+ 
+    
   }
 
   const setValuesHandler = () => {
 
     if (state.inputValues.minValue >= minLimitValue && state.inputValues.minValue < state.inputValues.maxValue) {
-        setState({...state, values:state.inputValues})
-        setView(state.inputValues.minValue)
+        updateState({...state, values:state.inputValues})
+        updateView(state.inputValues.minValue)
         setIsDisabled(true)
         setClassName('count')
     } else {
-      setView("incorrect value!"); 
+      updateView("incorrect value!"); 
       setIsDisabled(true); 
       setClassName("redtext");
       }
+      
   }
 
   const getViewHandler = () => { 
     
     if (state.inputValues.minValue >= state.inputValues.maxValue || state.inputValues.minValue < minLimitValue || state.inputValues.maxValue <= minLimitValue || state.inputValues.maxValue > maxLimitValue) {
-      setView('incorrect value!')
+      updateView('incorrect value!')
       setClassName("redtext");
     } else {
-      setView("enter values and press 'set'")
+      updateView("enter values and press 'set'")
       setIsDisabled(false)
       setClassName('text')
+      
     }
     
   }
@@ -105,34 +134,13 @@ function App() {
   // }
 
 
-  // //
-  // const getFromLocalHandler = () => {
-  //   let valueString = localStorage.getItem('counterValue')
-
-  //   if (valueString) {
-  //     let newValue = JSON.parse(valueString)
-  //     setValue(newValue)
-  //   }
-    
-  // }
-  // const clearLocalHandler = () => {
-  //   localStorage.clear
-  //   setValue(0)
-    
-  // }
+  
   
 
   return (
   
       <div className='App'>
-        {/* <div className='localStorage'>
-          <h1>LocalStorage</h1>
-          <h2>{value}</h2>
-          <button onClick={incrementHandler}>Increment</button>
-          <button onClick={setToLocalHandler}>setToLocalStorage</button>
-          <button onClick={getFromLocalHandler}>getFromLocalStorage</button>
-          <button onClick={clearLocalHandler}>clearLocalStorage</button>
-        </div> */}
+        
         <div className='Counter'>
         <Frame width='400px' height='210px'>
             <Frame width='380px' height='120px'>
@@ -140,6 +148,7 @@ function App() {
                   className={(state.inputValues.minValue >= state.inputValues.maxValue || state.inputValues.minValue < minLimitValue) ? 'inputerror' : 'input'}
                   label='max value:' 
                   placeholder={`<= ${maxLimitValue}`} 
+                  value = {state.inputValues.maxValue}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => getValueHandler(event,'maxValue')}
                   onClick={getViewHandler}/>
               
@@ -147,6 +156,7 @@ function App() {
                   className={(state.inputValues.minValue >= state.inputValues.maxValue || state.inputValues.minValue < minLimitValue) ? 'inputerror' : 'input'}
                   label='start value:' 
                   placeholder={`>= ${minLimitValue}`} 
+                  value = {state.inputValues.minValue}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => getValueHandler(event,'minValue')}
                   onClick={getViewHandler}/>
 
